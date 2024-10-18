@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FABRIC SHADER DEMO</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh; /* Utilisation de la hauteur de la fenêtre pour centrer verticalement */
+        }
+
+        .sprite-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sprite {
+            width: 650px; /* Largeur de chaque sprite en pixels */
+            height: 650px; /* Hauteur de chaque sprite en pixels */
+            background-size: 1950px 1300px; /* Taille totale du sprite (3x2) en pixels */
+            background-repeat: no-repeat;
+            margin: 0 auto; /* Centrer le sprite horizontalement */
+        }
+
+        .slider-container {
+            width: 800px; /* Largeur du conteneur du slider */
+            margin: 20px auto; /* Centrer le conteneur du slider horizontalement */
+        }
+
+        .slider-title {
+            color: white;
+            font-size: 18px;
+        }
+        .top-image {
+            width: 650px; /* Vous pouvez ajuster la taille de l'image ici */
+            margin-bottom: 20px; /* Espacement sous l'image */
+        }
+        h3 {
+            margin: 0 650px; /* Ajout de marge de 50px à gauche et à droite */
+            padding: 10px 0; /* Ajout d'un espacement vertical au besoin */
+            text-align: center; /* Garde le texte centré */
+        }
+    </style>
+</head>
+<body>
+    <h1>FABRIC SHADER DEMO</h1>
+
+    //<h3 style="margin-bottom: 10px;">Weaver mask maps I created in Substance designer. These are done using some shared maths between Substance graphs and Unity Shader, for procedural mapping of the color. </h3>
+
+    <img src="jpg-optim/WeaverType.jpg" alt="Description de l'image" class="top-image">
+    <img src="jpg-optim/FabricGraphSBS.jpg" alt="SBS Graph" class="top-image">
+    <img src="jpg-optim/FabricGraphSBS_FunctionA.jpg" alt="Description de l'image" class="top-image">
+    //<h3 style="margin-bottom: 10px;"> The shader in Unity was made so you just have to select the weaver type you want, and the "Sticker" (color map) to apply on the Fabric. Then I set up some variables to tweek the mapping and the rendering of the Mat.       </h3>
+    <img src="jpg-optim/StickerPres.jpg" alt="Description de l'image" class="top-image">
+    //<h3 style="margin-bottom: 10px;">Some non-exhaustive parameters: </h3>
+
+
+    <div class="sprite-container">
+        <div class="sprite" style="background-image: url('jpg-optim/Flipbook_TilingWeaver.jpg');"></div>
+        <h4 style="margin-bottom: 0px;">Weaver Tiling</h4>
+        <div class="slider-container">
+            <input type="range" min="0" max="5" value="3" class="slider" id="ValueSlider1">
+        </div>
+    </div>
+
+    <!-- Deuxième sprite avec son slider -->
+    <div class="sprite-container">
+        <div class="sprite" style="background-image: url('jpg-optim/Flipbook_PinchWeaver.jpg');"></div>
+        <h4 style="margin-bottom: 0px;">Weaver Pinch</h4>
+        <div class="slider-container">
+            <input type="range" min="0" max="5" value="0" class="slider" id="ValueSlider2">
+        </div>
+    </div>
+
+
+    <!-- Troisième sprite avec son slider -->
+    <div class="sprite-container">
+        <div class="sprite" style="background-image: url('jpg-optim/Flipbook_DistortWeaver.jpg');"></div>
+        <h4 style="margin-bottom: 0px;">Weaver Distort</h4>
+        <div class="slider-container">
+        <input type="range" min="0" max="5" value="0" class="slider" id="ValueSlider3">
+        </div>
+    </div>
+
+     <!-- Quatrième sprite avec son slider -->
+    <div class="sprite-container">
+        <div class="sprite" style="background-image: url('jpg-optim/Flipbook_RandomnessWeaver.jpg');"></div>
+        <h4 style="margin-bottom: 0px;">Weaver Random Value</h4>
+        <div class="slider-container">
+        <input type="range" min="0" max="5" value="0" class="slider" id="ValueSlider4">
+        </div>
+    </div>
+        
+    <div class="sprite-container">
+        <div class="sprite" style="background-image: url('jpg-optim/Flipbook_AOWeaver.jpg');"></div>
+        <h4 style="margin-bottom: 0px;">Remove AO</h4>
+        <div class="slider-container">
+        <input type="range" min="0" max="5" value="0" class="slider" id="ValueSlider5">
+        </div>
+    </div>        
+
+    <div class="sprite-container">
+        <div class="sprite" style="background-image: url('jpg-optim/Flipbook_TilingSticker.jpg');"></div>
+        <h4 style="margin-bottom: 0px;">Tiling Sticker</h4>
+        <div class="slider-container">
+        <input type="range" min="0" max="5" value="0" class="slider" id="ValueSlider6">
+        </div>
+    </div>   
+    
+    <div class="sprite-container">
+        <div class="sprite" style="background-image: url('jpg-optim/Flipbook_OffsetSticker.jpg');"></div>
+        <h4 style="margin-bottom: 0px;">Offset Sticker</h4>
+        <div class="slider-container">
+        <input type="range" min="0" max="5" value="3" class="slider" id="ValueSlider7">
+        </div>
+    </div>    
+
+    <h1>THANK YOU FOR WATCHING !</h1>
+
+    
+    <script>
+        const sprites = document.querySelectorAll(".sprite");
+        const sliders = Array.from({ length: sprites.length }, (_, i) => document.getElementById("ValueSlider" + (i + 1)));
+        const sliderTitles = document.querySelectorAll(".slider-title");
+        const spriteWidth = 650; // Largeur de chaque sprite en pixels.
+        const spriteHeight = 650; // Hauteur de chaque sprite en pixels.
+        const totalFramesX = 3; // Il y a un total de 3 sprites en abscisse.
+        const totalFramesY = 2; // Il y a un total de 2 sprites en ordonnée.
+
+        // Fonction pour mettre à jour le sprite en fonction de la position du curseur.
+        function updateSprite(index) {
+            return function() {
+                const currentFrame = sliders[index].value; // Obtient la valeur actuelle du curseur.
+                const spriteX = (currentFrame % totalFramesX) * spriteWidth; // Calcul de la position X du sprite.
+                const spriteY = Math.floor(currentFrame / totalFramesX) * spriteHeight; // Calcul de la position Y du sprite.
+                sprites[index].style.backgroundPosition = `-${spriteX}px -${spriteY}px`; // Positionnement du sprite.
+            }
+        }
+
+        // Appeler la fonction pour mettre à jour les sprites lorsque les curseurs sont déplacés.
+        sliders.forEach((slider, index) => {
+            slider.addEventListener("input", updateSprite(index));
+            updateSprite(index)(); // Appeler la fonction initialement pour mettre à jour le sprite.
+        });
+    </script>
+</body>
+</html>
